@@ -23,7 +23,7 @@ public class AuthorityEntityTest {
     @Test
     public void builderTest() {
         AuthorityEntity entity = AuthorityEntity.builder()
-                .name("NEW_AUTHORITY")
+                .authority("NEW_AUTHORITY")
                 .build();
         assertThat(entity.getId()).isNotNull();
     }
@@ -37,7 +37,7 @@ public class AuthorityEntityTest {
         assertThat(copy).hasSameHashCodeAs(entity);
         assertThat(copy).isEqualTo(entity);
 
-        copy.setId(new Random().nextInt());
-        assertThat(copy).isNotEqualTo(entity);
+        assertThat(AuthorityEntity.builder().id(new Random().nextInt()).build())
+                .isNotEqualTo(entity);
     }
 }

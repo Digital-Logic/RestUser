@@ -9,5 +9,5 @@ import lombok.*;
 @Builder(toBuilder = true)
 public class AuthorityDto {
     int id;
-    private String name;
+    private String authority;
 }

@@ -9,6 +9,7 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,9 +33,7 @@ public class AppConfig {
         Map<String, PasswordEncoder> encoders = new HashMap<>();
         encoders.put("bcypt", new BCryptPasswordEncoder(bCryptRounds));
 
-        DelegatingPasswordEncoder encoder = new DelegatingPasswordEncoder(encoderId, encoders);
-
-        return encoder;
+        return new DelegatingPasswordEncoder(encoderId, encoders);
     }
 
     @Bean
@@ -45,5 +44,12 @@ public class AppConfig {
         messageSource.setBasename("classpath:messages");
         messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
+    }
+
+    @Bean
+    public LocalValidatorFactoryBean getValidator() {
+        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+        bean.setValidationMessageSource(messageSource());
+        return bean;
     }
 }

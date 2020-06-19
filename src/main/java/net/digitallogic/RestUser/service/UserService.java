@@ -16,21 +16,21 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
 @Slf4j
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -108,7 +108,7 @@ public class UserService {
 
         try {
             roles.add(roleRepository.findByName(Role.USER.name).get());
-        } catch (NullPointerException ex) {
+        } catch (NoSuchElementException ex) {
             log.error("ERROR adding USER role to new user account: {}", userInfo.getEmail());
         }
 
@@ -124,7 +124,8 @@ public class UserService {
     @Transactional
     public UserDto updateUser(UserDto updateInfo) {
         Optional<UserEntity> userOptional = userRepository.findByIdWithRoles(updateInfo.getId());
-
+        if (userOptional.isEmpty())
+            throw new BadRequest(getMessage("exception.entityDoesNotExist", "User", updateInfo.getId()));
         // update user entity with the provided update info
         UserEntity user = userMapper.updateEntity(userOptional.get(), updateInfo);
 
@@ -147,6 +148,15 @@ public class UserService {
         user.getRoles().forEach(user::removeRole);
 
         userRepository.delete(user);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<UserEntity> userOptional = userRepository.findByEmailIgnoreCaseWithRolesAndAuthorities(email);
+        if (userOptional.isEmpty())
+            throw new UsernameNotFoundException(email);
+
+        return userOptional.get();
     }
 
     private String getMessage(String code, Object... args) {

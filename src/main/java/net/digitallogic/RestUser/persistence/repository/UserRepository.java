@@ -24,4 +24,10 @@ public interface UserRepository extends PagingAndSortingRepository<UserEntity, U
             "LEFT JOIN FETCH roles.authorities auth " +
             "WHERE user.id = :id")
     Optional<UserEntity> findByIdWithRolesAndAuthorities(@Param("id") UUID id);
+
+    @Query("SELECT user FROM UserEntity  user " +
+            "LEFT JOIN FETCH user.roles roles " +
+            "LEFT JOIN FETCH roles.authorities auth " +
+            "WHERE UPPER(user.email) = UPPER(:email)")
+    Optional<UserEntity> findByEmailIgnoreCaseWithRolesAndAuthorities(@Param("email") String email);
 }

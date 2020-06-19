@@ -21,11 +21,11 @@ public class AuthorityFixtures {
     private static Map<String, AuthorityEntity> authorityData =
             Arrays.stream(Authority.values())
                 .map(auth -> AuthorityEntity.builder()
-                    .name(auth.name)
+                    .authority(auth.name)
                     .id(index++)
                     .build()
                 )
-            .collect(Collectors.toMap(AuthorityEntity::getName, Function.identity()));
+            .collect(Collectors.toMap(AuthorityEntity::getAuthority, Function.identity()));
 
     private static AuthorityEntity copy(AuthorityEntity authorityEntity) {
         return authorityEntity.toBuilder()

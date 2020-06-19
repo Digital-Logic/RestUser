@@ -21,6 +21,10 @@ public class UserDto {
     private String lastName;
     private String email;
     private String password;
+    private boolean accountExpired;
+    private boolean accountLocked;
+    private boolean credentialsExpired;
+    private boolean accountEnabled;
 
     @Builder.Default
     private List<RoleDto> roles = new ArrayList<>();

@@ -10,19 +10,19 @@ import javax.validation.constraints.Size;
 @Builder
 public class CreateUserRequest {
 
-    @Size(max = 40, message = "${field.error.maxLength}")
-    @NotNull(message = "${field.error.notNull}")
+    @Size(max = 40, message = "{error.field.maxLength}")
+    @NotNull(message = "{error.field.notNull}")
     private String firstName;
 
-    @Size(max = 40, message = "${field.error.maxLength}")
-    @NotNull(message = "${field.error.notNull}")
+    @Size(max = 40, message = "{error.field.maxLength}")
+    @NotNull(message = "{error.field.notNull}")
     private String lastName;
 
-    @Size(max = 150, message = "${field.error.maxLength}")
-    @NotNull(message = "${field.error.notNull}")
+    @Size(max = 150, message = "{error.field.maxLength}")
+    @NotNull(message = "{error.field.notNull}")
     private String email;
 
-    @Size(min = 7, max = 60, message = "${field.error.minMaxLength}")
-    @NotNull(message = "${field.error.notNull}")
+    @Size(min = 7, max = 60, message = "{error.field.minMaxLength}")
+    @NotNull(message = "{error.field.notNull}")
     private String password;
 }

@@ -55,14 +55,14 @@ public class InitialAppSetup {
         log.info("Setup Authorities");
         Map<String, AuthorityEntity> authorities = StreamSupport.stream(
                 authorityRepository.findAll().spliterator(), false
-        ).collect(Collectors.toMap(AuthorityEntity::getName, Function.identity()));
+        ).collect(Collectors.toMap(AuthorityEntity::getAuthority, Function.identity()));
 
         List<AuthorityEntity> missingAuthorities =
                 Arrays.stream(Authority.values())
                 .map(Authority::name)
                 .filter(Predicate.not(authorities::containsKey))
                 .map(auth -> AuthorityEntity.builder()
-                        .name(auth)
+                        .authority(auth)
                         .build()
                 )
                 .collect(Collectors.toList());
@@ -88,7 +88,7 @@ public class InitialAppSetup {
                 .map(Role::name)
                 .filter(Predicate.not(roles::containsKey))
                 .map(roleName -> {
-                    if (roleName == ADMIN.name) {
+                    if (roleName.equals(ADMIN.name)) {
                         return RoleEntity.builder()
                                 .name(roleName)
                                 .authorities(
@@ -123,6 +123,7 @@ public class InitialAppSetup {
                     .firstName("Admin")
                     .lastName("Account")
                     .email("Admin@localhost")
+                    .accountEnabled(true)
                     .roles(StreamSupport.stream(
                                 roleRepository.findAllByNameIn(
                                     Arrays.asList(ADMIN.name, Role.USER.name)

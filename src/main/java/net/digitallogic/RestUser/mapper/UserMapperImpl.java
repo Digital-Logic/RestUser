@@ -2,6 +2,9 @@ package net.digitallogic.RestUser.mapper;
 
 import net.digitallogic.RestUser.persistence.model.UserEntity;
 import net.digitallogic.RestUser.web.controller.request.CreateUserRequest;
+import net.digitallogic.RestUser.web.controller.response.UserResponse;
+import net.digitallogic.RestUser.web.dto.AuthorityDto;
+import net.digitallogic.RestUser.web.dto.RoleDto;
 import net.digitallogic.RestUser.web.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,6 +42,10 @@ public class UserMapperImpl implements UserMapper {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
+                .accountExpired(!user.isAccountNonExpired())
+                .accountLocked(!user.isAccountNonLocked())
+                .credentialsExpired(!user.isCredentialsNonExpired())
+                .accountEnabled(user.isEnabled())
                 .build();
 
         PersistenceUtil pu = Persistence.getPersistenceUtil();
@@ -47,6 +54,23 @@ public class UserMapperImpl implements UserMapper {
             userDto.setRoles(roleMapper.toDto(user.getRoles()));
         }
         return userDto;
+    }
+
+    @Override
+    public UserResponse toUserResponse(UserDto user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .authorities(
+                        user.getRoles().stream()
+                            .map(RoleDto::getAuthorities)
+                            .flatMap(List::stream)
+                            .map(AuthorityDto::getAuthority)
+                        .collect(Collectors.toSet())
+                )
+                .build();
     }
 
     @Override
@@ -86,6 +110,13 @@ public class UserMapperImpl implements UserMapper {
     public List<UserEntity> toEntity(Iterable<UserDto> users) {
         return StreamSupport.stream(users.spliterator(), false)
                 .map(this::toEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserResponse> toUserResponse(Iterable<UserDto> users) {
+        return StreamSupport.stream(users.spliterator(), false)
+                .map(this::toUserResponse)
                 .collect(Collectors.toList());
     }
 }
